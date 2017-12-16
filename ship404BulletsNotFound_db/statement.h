@@ -10,8 +10,9 @@ namespace SQL{
 		void initcolumns(int max_columns);
 		int dimensions(bool rowOrccolumns);
 		void connectTo(char* sql, std::string database);
-		void retriveTable(char* sql, char *tablename, int lenght);
+		void extractRecord(char** query_result, int row);
 		statement(std::string directory, int query_size, int max_chars);
+		void selectFromTable(char* sql, const char *tablename, int lenght);
 		void createTable(char* sql, const char *tablename, int namelenght);
 		void add(const char* value, int lenght, SQL::statement::Data column);
 		void insertIntoTable(char* sql, const char *tablename, int namelenght);

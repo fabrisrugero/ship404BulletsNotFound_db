@@ -36,10 +36,13 @@ void SQL::statement::connectTo(char* sql, std::string database){
 	while (this->indexer++ < this->query_size) sql[this->indexer] = this->querychararcters[this->indexer]; this->indexer = 0;
 };
 int SQL::statement::dimensions(bool rowOrccolumn){
-
-	return 0;
+	if (rowOrccolumn) return this->columns;
+	else return this->rows;
 };
-void SQL::statement::retriveTable(char* sql, char *tablename, int lenght){
+void SQL::statement::extractRecord(char** query_result, int row){
+
+}
+void SQL::statement::selectFromTable(char* sql, const char *tablename, int lenght){
 
 
 };
