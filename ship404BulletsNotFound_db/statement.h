@@ -8,14 +8,16 @@ namespace SQL{
 		~statement();
 		void initcolumns(int max_columns);
 		int dimensions(bool rowOrccolumns);
-		enum Data{ TYPE, VALUE, NUULL, VALUETOTYPE };
+		enum Data{ TYPE, VALUE, VALUETOTYPE };
+		void quotevalues(int starts, int ends);
 		void connectTo(char* sql, std::string database);
 		void extractRecord(char** query_result, int row);
 		statement(std::string directory, int query_size, int max_chars);
 		void selectFromTable(char* sql, const char *tablename, int lenght);
 		void createTable(char* sql, const char *tablename, int namelenght);
-		void add(const char* value, int lenght, SQL::statement::Data column);
 		void insertIntoTable(char* sql, const char *tablename, int namelenght);
+		void add(const char* value, int lenght, SQL::statement::Data column, bool addmore = false);
+
 
 
 	private:

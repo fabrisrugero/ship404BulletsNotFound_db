@@ -10,38 +10,11 @@ int main()
 
 	int rc = 0;
 	const char* sqlcommand;
-	char querystatement[300];
+	char querystatement[70];
 	sqlcommand = querystatement;
-	std::string database = "MyDb.db";
+	std::string database = "MyDb";
 	std::string directory = "..\\Debug\\";
-	SQL::statement *query = new SQL::statement(directory, 50, 8);
-	//cout << querystatement << endl;
-	//query->add("startX", 6, query->VALUE);
-	//query->add("startY", 6, query->VALUE);
-	//query->add("constX", 6, query->VALUE);
-	//query->add("constY", 6, query->VALUE);
-	//query->add("maxX", 4, query->VALUE);
-	//query->add("maxY", 4, query->VALUE);
-	//query->add("\0", 0, query->NUULL);
-	//for (int r = 0; r < 6; r++) query->add("REAL", 4, query->TYPE);
-	//query->createTable(querystatement, "circle", 6);
-	//cout << querystatement << endl;
-	//rc = query->dimensions(false);
-	//query->add("\0", 0, query->NUULL);
-	//for (int r = 0; r < rc; r++) query->add("\0", 0, query->VALUETOTYPE);
-	//query->add("\0", 0, query->NUULL);
-	//query->add("12356.23", 8, query->VALUE);
-	//query->add("45628", 5, query->VALUE);
-	//query->add("78956.126", 9, query->VALUE);
-	//query->add("002153.2356", 11, query->VALUE);
-	//query->add("85", 2, query->VALUE);
-	//query->add("4", 1, query->VALUE);
-	//query->insertIntoTable(querystatement, "circle", 6);
-	//cout << querystatement << endl;
-	//query->selectFromTable(querystatement, "circle", 6);
-	//cout << querystatement << endl;
-	//delete query;
-	//----------------------------------------------------------------------------
+	SQL::statement *query = new SQL::statement(directory, 70, 9);
 	char *error;
 	// Open Database
 	cout << "Opening MyDb.db ..." << endl;
@@ -61,7 +34,6 @@ int main()
 	}
 	//----------------------------------------------------------------------------
 	// Execute SQL
-	//const char *sqlCreateTable = "CREATE TABLE MyTable (id INTEGER PRIMARY KEY, value STRING);";
 	query->add("value", 5, query->VALUE);
 	query->add("STRING", 6, query->TYPE);
 	query->createTable(querystatement, "MyTable", 7);
@@ -78,9 +50,10 @@ int main()
 	//----------------------------------------------------------------------------
 	// Execute SQL
 	cout << "Inserting a value into MyTable ..." << endl;
-	//const char *sqlInsert = "INSERT INTO MyTable VALUES(NULL, 'A Value');"
-	query->add('\0', 0, SQL::statement::NUULL);
-	query->add()
+	query->add('\0', 0, query->VALUETOTYPE);
+	query->add("A value", 7, query->VALUE);
+	query->insertIntoTable(querystatement, "MyTable", 7);
+	delete query;
 	rc = sqlite3_exec(db, querystatement, NULL, NULL, &error);
 	if (rc)
 	{
@@ -141,7 +114,6 @@ int main()
 	cout << "Closing MyDb.db ..." << endl;
 	sqlite3_close(db);
 	cout << "Closed MyDb.db" << endl << endl;
-
 	// Wait For User To Close Program
 	cout << "Please press any key to exit the program ..." << endl;
 	cin.get();

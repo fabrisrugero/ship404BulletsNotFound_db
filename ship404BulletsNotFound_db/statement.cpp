@@ -85,7 +85,7 @@ void SQL::statement::concantenate(const char *a, int b, const char *c, int d){
 		this->querychararcters[this->position + this->indexer] = c[this->indexer++];
 	this->position += this->indexer; this->indexer = 0;
 };
-void SQL::statement::add(const char* value, int lenght, SQL::statement::Data column){
+void SQL::statement::add(const char* value, int lenght, SQL::statement::Data column, bool addmore){
 	if (this->index < this->max_columns && column == VALUE)
 		while (this->indexer < this->max_chars && indexer < lenght)
 			this->values[this->index][this->indexer] = value[this->indexer++];
@@ -98,8 +98,8 @@ void SQL::statement::add(const char* value, int lenght, SQL::statement::Data col
 	if (column == TYPE) this->types_lenght[this->index++] = lenght;
 	else if (column == VALUE) this->values_lenght[this->index++] = lenght;
 	else if (column == VALUETOTYPE) this->types_lenght[this->index] = this->values_lenght[this->index++];
-	if (column != NUULL) this->columns = this->index;
-	else if (column == NUULL) this->index = 0;
+	if (addmore) this->columns = this->index;
+	else if (!addmore) this->index = 0;
 	this->indexer = 0;
 };
 void SQL::statement::initcolumns(int max_columns){
@@ -113,5 +113,9 @@ void SQL::statement::initcolumns(int max_columns){
 	this->max_columns = max_columns;
 	this->max_chars = max_chars;
 	this->indexer = 0;
+};
+
+void SQL::statement::quotevalues(int starts, int ends){
+
 };
 
