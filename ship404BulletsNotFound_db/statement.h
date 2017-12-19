@@ -39,7 +39,7 @@ namespace SQL{
 		int* values_lenght;
 		void clearbuffer();
 		char* querychararcters;
-		void initcolumns(char** arr, int max_columns);
+		void initcolumns(char*** arr, int max_columns);
 		void concantenate(const char *a, int b, const char *c, int d);
 	};
 }

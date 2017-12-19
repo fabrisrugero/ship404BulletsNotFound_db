@@ -81,7 +81,7 @@ int main()
 		sqlite3_free(error);
 	}
 	else{
-		//query->copyrecords(results, rows, columns);
+		query->copyrecords(results, rows, columns);
 		// Display Table
 		for (int rowCtr = 0; rowCtr <= rows; ++rowCtr)
 		{
@@ -120,8 +120,8 @@ int main()
 	std::cout << "Closed MyDb.db" << endl << endl;
 	// Table extraction test
 	rows = 0;
-	//char cell[50];
-	//while (query->readcell(cell, rows++)) std::cout << cell << endl;
+	char cell[50];
+	while (query->readcell(cell, rows++)) std::cout << cell << endl;
 	// Wait For User To Close Program
 	std::cout << "Please press any key to exit the program ..." << endl;
 	delete query;
