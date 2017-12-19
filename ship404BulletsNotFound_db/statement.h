@@ -6,18 +6,16 @@ namespace SQL{
 	{
 	public:			
 		~statement();
-		void initcolumns(int max_columns);
 		int dimensions(bool rowOrccolumns);
 		enum Data{ TYPE, VALUE, VALUETOTYPE };
-		void quotevalues(int starts, int ends);
+		bool readcell(char *cell, int index);
 		void connectTo(char* sql, std::string database);
-		void extractRecord(char** query_result, int row);
-		statement(std::string directory, int query_size, int max_chars);
+		void copyrecords(char** query_result, int rows, int columns);
 		void selectFromTable(char* sql, const char *tablename, int lenght);
 		void createTable(char* sql, const char *tablename, int namelenght);
 		void insertIntoTable(char* sql, const char *tablename, int namelenght);
+		statement(std::string directory, int query_size, int max_chars, int max_columns);
 		void add(const char* value, int lenght, SQL::statement::Data column, bool addmore = false);
-
 
 
 	private:
@@ -31,6 +29,8 @@ namespace SQL{
 		int position;
 		char** values;
 		int max_chars;
+		size_t* sizes;
+		char** results;
 		bool startOver;
 		int query_size;
 		char* directory;
@@ -39,6 +39,7 @@ namespace SQL{
 		int* values_lenght;
 		void clearbuffer();
 		char* querychararcters;
+		void initcolumns(char** arr, int max_columns);
 		void concantenate(const char *a, int b, const char *c, int d);
 	};
 }
