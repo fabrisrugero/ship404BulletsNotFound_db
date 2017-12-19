@@ -7,8 +7,10 @@ namespace SQL{
 	public:			
 		~statement();
 		int dimensions(bool rowOrccolumns);
-		enum Data{ TYPE, VALUE, VALUETOTYPE };
 		bool readcell(char *cell, int index);
+		enum Data{ TYPE, VALUE, VALUETOTYPE };
+		int cellposition(int col, int rowindex);
+		enum COLMN { ONE, TWO, THREE, FOUR, FIVE, SIX };
 		void connectTo(char* sql, std::string database);
 		void copyrecords(char** query_result, int rows, int columns);
 		void selectFromTable(char* sql, const char *tablename, int lenght);

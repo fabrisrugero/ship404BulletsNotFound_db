@@ -16,11 +16,9 @@ int main()
 	const char* sqlcommand;
 	char querystatement[300];
 	sqlcommand = querystatement;
-	int num = rand() % 98652 + 24589;
 	std::string database = "MyDb";
 	std::string directory = "..\\Debug\\";
-	std::string example = std::to_string(num);
-	SQL::statement *query = new SQL::statement(directory, 300, 50, 1);
+	SQL::statement *query = new SQL::statement(directory, 300, 50, 4);
 	char *error;
 	// Open Database
 	std::cout << "Opening MyDb.db ..." << endl;
@@ -35,10 +33,14 @@ int main()
 	else
 		std::cout << "Opened MyDb.db." << endl << endl;
 	
-	//----------------------------------------------------------------------------
-	// Execute SQL
-	query->add("value", 5, query->VALUE);
-	query->add("STRING", 6, query->TYPE);
+	query->add("startX", 6, query->VALUE, true);
+	query->add("startY", 6, query->VALUE, true);
+	query->add("constX", 6, query->VALUE, true);
+	query->add("constY", 6, query->VALUE);
+	query->add("REAL", 4, query->TYPE, true);
+	query->add("REAL", 4, query->TYPE, true);
+	query->add("REAL", 4, query->TYPE, true);
+	query->add("REAL", 4, query->TYPE);
 	query->createTable(querystatement, "MyTable", 7);
 	rc = sqlite3_exec(db, sqlcommand, NULL, NULL, &error);
 	if (rc)
@@ -49,13 +51,15 @@ int main()
 	else
 		std::cout << "Created MyTable." << endl << endl;
 	
-	//----------------------------------------------------------------------------
-	// Execute SQL
 	std::cout << "Inserting a value into MyTable ..." << endl;
-	example.insert(0, "'");
-	example.insert(example.length(), "'");
+	query->add('\0', 0, query->VALUETOTYPE, true);
+	query->add('\0', 0, query->VALUETOTYPE, true);
+	query->add('\0', 0, query->VALUETOTYPE, true);
 	query->add('\0', 0, query->VALUETOTYPE);
-	query->add(&example[0], example.length(), query->VALUE);
+	query->add(&std::to_string(rand() % 98652 + 24589)[0], 5, query->VALUE, true);
+	query->add(&std::to_string(rand() % 98652 + 24589)[0], 5, query->VALUE, true);
+	query->add(&std::to_string(rand() % 98652 + 24589)[0], 5, query->VALUE, true);
+	query->add(&std::to_string(rand() % 98652 + 24589)[0], 5, query->VALUE);
 	query->insertIntoTable(querystatement, "MyTable", 7);
 	rc = sqlite3_exec(db, sqlcommand, NULL, NULL, &error);
 	if (rc)
@@ -65,11 +69,7 @@ int main()
 	}
 	else
 		std::cout << "Inserted a value into MyTable." << endl << endl;
-	
 
-	
-	//----------------------------------------------------------------------------
-	// Display MyTable
 	std::cout << "Retrieving values in MyTable ..." << endl;
 	query->selectFromTable(querystatement, "MyTable", 7);
 	char **results = NULL;
@@ -81,27 +81,18 @@ int main()
 		sqlite3_free(error);
 	}
 	else{
+		char contents[50];
 		query->copyrecords(results, rows, columns);
-		// Display Table
-		for (int rowCtr = 0; rowCtr <= rows; ++rowCtr)
-		{
-			for (int colCtr = 0; colCtr < columns; ++colCtr)
-			{
-				// Determine Cell Position
-				int cellPosition = (rowCtr * columns) + colCtr;
-
-				// Display Cell Value
+		for (int row = 0; row <= rows; ++row){
+			for (int colCtr = 1; colCtr <= query->FOUR; ++colCtr){
 				std::cout.width(12);
 				std::cout.setf(ios::left);
-				std::cout << results[cellPosition] << " ";
+				query->readcell(contents,
+					query->cellposition(query->FOUR - colCtr, row));
+				std::cout << contents<< " ";
 			}
-
-			// End Line
 			std::cout << endl;
-
-			// Display Separator For Header
-			if (0 == rowCtr)
-			{
+			if (0 == row){
 				for (int colCtr = 0; colCtr < columns; ++colCtr)
 				{
 					std::cout.width(12);
@@ -114,15 +105,9 @@ int main()
 	}
 
 	sqlite3_free_table(results);
-	// Close Database
 	std::cout << "Closing MyDb.db ..." << endl;
 	sqlite3_close(db);
 	std::cout << "Closed MyDb.db" << endl << endl;
-	// Table extraction test
-	rows = 0;
-	char cell[50];
-	while (query->readcell(cell, rows++)) std::cout << cell << endl;
-	// Wait For User To Close Program
 	std::cout << "Please press any key to exit the program ..." << endl;
 	delete query;
 	std::cin.get();
