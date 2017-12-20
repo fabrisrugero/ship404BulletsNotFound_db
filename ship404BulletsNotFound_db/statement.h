@@ -10,6 +10,7 @@ namespace SQL{
 		bool readcell(char *cell, int index);
 		enum Data{ TYPE, VALUE, VALUETOTYPE };
 		int cellposition(int col, int rowindex);
+		size_t getlenght(int columindex, int rowindex);
 		enum COLMN { ONE, TWO, THREE, FOUR, FIVE, SIX };
 		void connectTo(char* sql, std::string database);
 		void copyrecords(char** query_result, int rows, int columns);

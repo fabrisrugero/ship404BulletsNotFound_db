@@ -3,7 +3,7 @@
 SQL::statement::~statement(){
 	for (this->indexer = 0; this->indexer < this->max_columns; this->indexer++){
 		delete[] this->values[this->indexer]; delete[] this->types[this->indexer++];}
-	this->max_columns = this->rows*this->columns;
+	this->max_columns = this->rows*this->columns + this->columns;
 	for (this->Indexer = 0; this->Indexer < this->max_columns; this->Indexer++)
 		delete[] this->results[this->Indexer++];
 	delete[] this->types;
@@ -42,10 +42,6 @@ void SQL::statement::connectTo(char* sql, std::string database){
 	for (this->indexer = 0; this->indexer < this->query_size; this->indexer++)
 		sql[this->indexer] = this->querychararcters[this->indexer]; 
 };
-int SQL::statement::dimensions(bool rowOrccolumn){
-	if (rowOrccolumn) return this->rows;
-	else return this->columns;
-};
 void SQL::statement::copyrecords(char** query_results, int rows, int columns){
 	this->rows = rows;
 	this->columns = columns;
@@ -60,8 +56,15 @@ void SQL::statement::copyrecords(char** query_results, int rows, int columns){
 		}
 	}
 }
-int SQL::statement::cellposition(int column, int rowindex){
-
+int SQL::statement::cellposition(int columnindex, int rowindex){
+	return (rowindex * this->columns) + columnindex;
+};
+size_t SQL::statement::getlenght(int columindex, int rowindex){
+	return this->sizes[(rowindex * this->columns) + columindex];
+};
+int SQL::statement::dimensions(bool rowOrccolumn){
+	if (rowOrccolumn) return this->rows;
+	else return this->columns;
 };
 bool SQL::statement::readcell(char *cell, int index){
 	if (this->indexer = index < (this->rows*this->columns) + this->columns)
