@@ -20,7 +20,7 @@ bool opendb(SQL::statement *query,std::string database, char *querystatement, co
 		std::cout << "Opened " << database << ".db." << endl << endl;
 	return true;
 }
-void createTable(SQL::statement *query, std::string table, char *querystatement, const char *sqlcommand, sqlite3 **db, char **error){
+void createTable(SQL::statement *query, std::string table, char *querystatement, const char *sqlcommand, sqlite3 **db){
 	query->add("name", 4, query->VALUE, true);
 	query->add("part", 4, query->VALUE, true);
 	query->add("radius", 6, query->VALUE, true);
@@ -32,7 +32,7 @@ void createTable(SQL::statement *query, std::string table, char *querystatement,
 	query->add("INTEGER", 7, query->TYPE, true);
 	query->add("INTEGER", 7, query->TYPE);
 	query->createTable(querystatement, &table[0], table.length());
-	int rc = sqlite3_exec(*db, sqlcommand, NULL, NULL, error);
+	char *error; int rc = sqlite3_exec(*db, sqlcommand, NULL, NULL, &error);
 	if (rc)
 	{
 		cerr << "Error executing SQLite3 statement: " << sqlite3_errmsg(*db) << endl << endl;
@@ -41,7 +41,7 @@ void createTable(SQL::statement *query, std::string table, char *querystatement,
 	else
 		std::cout << "Created " << table << "." << endl << endl;
 }
-void InsertIntoTable(SQL::statement *query, std::string table, char *querystatement, const char *sqlcommand, sqlite3 **db, char **error)
+void InsertIntoTable(SQL::statement *query, std::string table, char *querystatement, const char *sqlcommand, sqlite3 **db)
 {
 	std::cout << "Inserting a row into " << table << " ..." << endl;
 	query->add("name", 4, query->TYPE, true);
@@ -50,12 +50,12 @@ void InsertIntoTable(SQL::statement *query, std::string table, char *querystatem
 	query->add("partx", 5, query->TYPE, true);
 	query->add("party", 5, query->TYPE);
 	query->add("'blue'", 6, query->VALUE, true);
-	query->add("'nose'", 6, query->VALUE, true);
-	query->add("4", 1, query->VALUE, true);
-	query->add("12", 2, query->VALUE, true);
-	query->add("45", 2, query->VALUE);
+	query->add("'center'", 8, query->VALUE, true);
+	query->add("5", 1, query->VALUE, true);
+	query->add("38", 2, query->VALUE, true);
+	query->add("48", 2, query->VALUE);
 	query->insertIntoTable(querystatement, &table[0], table.length());
-	int rc = sqlite3_exec(*db, sqlcommand, NULL, NULL, error);
+	char *error; int rc = sqlite3_exec(*db, sqlcommand, NULL, NULL, &error);
 	if (rc){
 		cerr << "Error executing SQLite3 statement: " << sqlite3_errmsg(*db) << endl << endl;
 		sqlite3_free(error);
@@ -63,14 +63,14 @@ void InsertIntoTable(SQL::statement *query, std::string table, char *querystatem
 	else
 		std::cout << "Inserted a row into " << table << "." << endl << endl;
 }
-void updateRowInTable(SQL::statement *query, std::string table, char *querystatement, const char *sqlcommand, sqlite3 **db, char **error){
+void updateRowInTable(SQL::statement *query, std::string table, char *querystatement, const char *sqlcommand, sqlite3 **db){
 	std::cout << "Updatinging a row in " << table << " ..." << endl;
 	query->add("id", 2, query->TYPE, true);
-	query->add("outergrad", 9, query->TYPE);
-	query->add("2", 1, query->VALUE, true);
-	query->add("0.2", 3, query->VALUE);
+	query->add("party", 5, query->TYPE);
+	query->add("1", 1, query->VALUE, true);
+	query->add("48", 2, query->VALUE);
 	query->updateRowInTable(querystatement, &table[0], table.length(), query->ONE);
-	int rc = sqlite3_exec(*db, sqlcommand, NULL, NULL, error);
+	char *error; int rc = sqlite3_exec(*db, sqlcommand, NULL, NULL, &error);
 	if (rc){
 		cerr << "Error executing SQLite3 statement: " << sqlite3_errmsg(*db) << endl << endl;
 		sqlite3_free(error);
@@ -78,12 +78,12 @@ void updateRowInTable(SQL::statement *query, std::string table, char *querystate
 	else
 		std::cout << "Updated a row in " << table << "." << endl << endl;
 }
-void deleteFromTable(SQL::statement *query, std::string table, char *querystatement, const char *sqlcommand, sqlite3 **db, char **error){
+void deleteFromTable(SQL::statement *query, std::string table, char *querystatement, const char *sqlcommand, sqlite3 **db){
 	std::cout << "Deleting a row from " << table << " ..." << endl;
 	query->add("id", 2, query->TYPE);
 	query->add("3", 10, query->VALUE);
 	query->deleteRowInTable(querystatement, &table[0], table.length(), query->ONE);
-	int rc = sqlite3_exec(*db, sqlcommand, NULL, NULL, error);
+	char *error; int rc = sqlite3_exec(*db, sqlcommand, NULL, NULL, &error);
 	if (rc){
 		cerr << "Error executing SQLite3 statement: " << sqlite3_errmsg(*db) << endl << endl;
 		sqlite3_free(error);
@@ -108,10 +108,10 @@ int main()
 	std::string table = "gameobj_parts";
 	SQL::statement *query = new SQL::statement(directory, 300, 50, 20);
 	if (!opendb(query, database, querystatement, sqlcommand, &db)) return 1;
-	//createTable(query, table, querystatement, sqlcommand, &db, &error);
-	//InsertIntoTable(query, table, querystatement, sqlcommand, &db, &error);
-	//updateRowInTable(query, table, querystatement, sqlcommand, &db, &error);
-	//deleteFromTable(query, table, querystatement, sqlcommand, &db, &error);
+	//createTable(query, table, querystatement, sqlcommand, &db);
+	InsertIntoTable(query, table, querystatement, sqlcommand, &db);
+	//updateRowInTable(query, table, querystatement, sqlcommand, &db);
+	//deleteFromTable(query, table, querystatement, sqlcommand, &db);
 	//sqlite3_exec(db, "ALTER TABLE qaudratic_values RENAME TO gameobj_parts", NULL, NULL, NULL);
 
 	std::cout << "Retrieving rows in " << table << " ..." << endl << endl;
