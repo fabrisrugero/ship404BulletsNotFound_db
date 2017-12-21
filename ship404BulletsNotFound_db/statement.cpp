@@ -26,9 +26,9 @@ SQL::statement::statement(std::string directory, int query_size, int max_chars, 
 	this->query_size = query_size;
 	this->max_columns = max_columns;
 	this->dir_size = directory.length();
-	this->types_lenght = new int[max_chars + 1];
+	this->types_lenght = new int[max_chars + 1]();
 	this->initcolumns(&this->types, max_columns);
-	this->values_lenght = new int[max_chars + 1];
+	this->values_lenght = new int[max_chars + 1]();
 	this->initcolumns(&this->values, max_columns);
 	this->querychararcters = new char[query_size + 1];
 	this->directory = new char[directory.length() + 1];
@@ -72,14 +72,44 @@ bool SQL::statement::readcell(char *cell, int index){
 			cell[this->Indexer] = this->results[index][this->Indexer];
 	return this->indexer;
 };
-void SQL::statement::selectFromTable(char* sql, const char *tablename, int lenght){
+void SQL::statement::deleteRowInTable(char* sql, const char *tablename, int lenght, int column){
+	this->clearbuffer();
+	this->concantenate("DELETE FROM ", 12, tablename, 0);
+	this->concantenate(tablename, lenght, " WHERE ", 7);
+	this->concantenate(this->types[column], this->types_lenght[column], " = ", 3);
+	this->concantenate(this->values[column], this->values_lenght[column], ";", 1);
+	for (this->indexer = 0; this->indexer < this->query_size; this->indexer++)
+		sql[this->indexer] = this->querychararcters[this->indexer];
+};
+void SQL::statement::updateRowInTable(char* sql, const char *tablename, int lenght, int column){
+	this->clearbuffer();
+	this->concantenate("UPDATE ", 7, tablename, lenght);
+	this->concantenate(" SET ", 5, tablename, 0);
+	for (int colum = 0; colum < this->max_columns; colum++){
+		if (this->types_lenght[colum] == 0 || colum == column) continue;
+		this->concantenate(this->types[colum], this->types_lenght[colum], " = ", 3);
+		this->concantenate(this->values[colum], this->values_lenght[colum], ", ", 2);}
+	this->position -= 2;
+	this->concantenate(" WHERE ", 7, tablename, 0);
+	this->concantenate(this->types[column], this->types_lenght[column], " = ", 3);
+	this->concantenate(this->values[column], this->values_lenght[column], ";", 1);
+	for (this->indexer = 0; this->indexer < this->query_size; this->indexer++)
+		sql[this->indexer] = this->querychararcters[this->indexer];
+};
+void SQL::statement::selectFromTable(char* sql, const char *tablename, int lenght, int column){
 	this->clearbuffer();
 	this->concantenate("SELECT ", 7, tablename, 0);
-	for (int row = 0; row < this->max_columns; row++)
-		this->concantenate(this->types[row], this->types_lenght[row], ", ", 2);
-	this->position -= 2;
+	for (int colum = 0; colum < this->max_columns; colum++){
+		if (this->types_lenght[colum] == 0 || colum == column) continue;
+		this->concantenate(this->types[colum], this->types_lenght[colum], ", ", 2);}
+	if (this->position > 7) this->position -= 2;
+	else this->concantenate(tablename, 0, "*", 1);
 	this->concantenate(tablename, 0, " FROM ", 6);
-	this->concantenate(tablename, lenght, ";", 1);
+	if (column < 0) this->concantenate(tablename, lenght, ";", 1);
+	else{
+		this->concantenate(tablename, lenght, " WHERE ", 7);
+		this->concantenate(this->types[column], this->types_lenght[column], " = ", 3);
+		this->concantenate(this->values[column], this->values_lenght[column], ";", 1);}
 	for (this->indexer = 0; this->indexer < this->query_size; this->indexer++)
 		sql[this->indexer] = this->querychararcters[this->indexer]; 
 };
@@ -87,12 +117,14 @@ void SQL::statement::insertIntoTable(char* sql, const char *tablename, int namel
 	this->clearbuffer();
 	this->concantenate("INSERT INTO ", 12, tablename, 0);
 	this->concantenate(tablename, namelenght, " (", 2);
-	for (this->Indexer = 0; this->Indexer < this->max_columns; this->Indexer++)
-		this->concantenate(this->types[this->Indexer], this->types_lenght[this->Indexer], ", ", 2);
-	this->position -= 2;
+	for (this->Indexer = 0; this->Indexer < this->max_columns; this->Indexer++){
+		if (this->types_lenght[Indexer] == 0 ) continue;
+		this->concantenate(this->types[this->Indexer], this->types_lenght[this->Indexer], ", ", 2);}
+	if (this->position > 14 + namelenght) this->position -= 2; else return;
 	this->concantenate(") VALUES (", 10, tablename, 0);
-	for (this->Indexer = 0; this->Indexer < this->max_columns; this->Indexer++)
-		this->concantenate(this->values[this->Indexer], this->values_lenght[this->Indexer], ", ", 2);
+	for (this->Indexer = 0; this->Indexer < this->max_columns; this->Indexer++){
+		if (this->values_lenght[this->Indexer] == 0) continue;
+		this->concantenate(this->values[this->Indexer], this->values_lenght[this->Indexer], ", ", 2);}
 	this->position -= 2;
 	this->concantenate(");", 2, tablename, 0);
 	for (this->indexer = 0; this->indexer < this->query_size; this->indexer++)
@@ -103,6 +135,7 @@ void SQL::statement::createTable(char* sql, const char *tablename, int namelengh
 	this->concantenate("CREATE TABLE ", 13, tablename, 0);
 	this->concantenate(tablename, namelenght, " (id INTEGER PRIMARY KEY", 24);
 	for (this->Indexer = 0; this->Indexer < this->max_columns; this->Indexer++){
+		if (this->types_lenght[Indexer] == 0 || this->values_lenght[this->Indexer] == 0) continue;
 		this->concantenate(", ", 2, this->values[this->Indexer], this->values_lenght[this->Indexer]);
 		this->concantenate(" ", 1, this->types[this->Indexer], this->types_lenght[this->Indexer]);}
 	this->concantenate(");", 2, tablename, 0);
@@ -124,12 +157,8 @@ void SQL::statement::add(const char* value, int lenght, SQL::statement::Data col
 	else if (this->index < this->max_columns && column == TYPE)
 		for (this->indexer = 0; this->indexer < this->max_chars && this->indexer < lenght; this->indexer++)
 			this->types[this->index][this->indexer] = value[this->indexer];
-	else if (this->index < this->max_columns && column == VALUETOTYPE)
-		for (this->indexer = 0; this->indexer < this->max_chars && this->indexer < this->values_lenght[this->index]; this->indexer++)
-			this->types[this->index][this->indexer] = this->values[this->index][this->indexer];
 	if (column == TYPE) this->types_lenght[this->index] = lenght;
 	else if (column == VALUE) this->values_lenght[this->index] = lenght;
-	else if (column == VALUETOTYPE) this->types_lenght[this->index] = this->values_lenght[this->index];
 	if (addmore) this->index++;
 	else this->index = 0;
 	this->indexer = 0;
